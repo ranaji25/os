@@ -77,3 +77,26 @@ int main() {
     scan(requestQueue, n, head, maxCylinder);
     return 0;
 }
+/*
+Enter the number of requests: 9
+Enter the request queue:
+55 58 39 18 90 160 150 38 184
+Enter the initial head position: 100
+Enter the maximum cylinder number: 199
+SCAN Disk Scheduling Algorithm
++------------------------+------------------+------------------+
+| Request                | Head Movement     | Cumulative Seek  |
++------------------------+------------------+------------------+
+| 100                    -> 150    | 50               | 50               |
+| 150                    -> 160    | 10               | 60               |
+| 160                    -> 184    | 24               | 84               |
+| 184                    -> 199    | 15               | 99               |
+| 0                      -> 90     | 90               | 189              |
+| 90                     -> 58     | 32               | 221              |
+| 58                     -> 55     | 3                | 224              |
+| 55                     -> 39     | 16               | 240              |
+| 39                     -> 38     | 1                | 241              |
+| 38                     -> 18     | 20               | 261              |
++------------------------+------------------+------------------+
+Total Seek Time (SCAN): 261
+*/
