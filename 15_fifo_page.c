@@ -67,3 +67,44 @@ int main() {
 
     return 0;
 }
+
+
+/*
+Enter the number of pages: 15
+Enter the page references:
+7
+0
+1
+2
+0
+3
+0
+4
+2
+3
+0
+3
+1
+2
+0
+Referenced String: 7 0 1 2 0 3 0 4 2 3 0 3 1 2 0
+FIFO Page Replacement:
+Memory: 7 0 0
+Memory: 7 0 0
+Memory: 7 1 0
+Memory: 7 1 2
+Memory: 0 1 2
+Memory: 0 3 2
+Memory: 0 3 2
+Memory: 0 3 4
+Memory: 2 3 4
+Memory: 2 3 4
+Memory: 2 0 4 
+Memory: 2 0 3
+Memory: 1 0 3
+Memory: 1 2 3
+Memory: 1 2 0
+Hits: 3
+Misses: 12
+Page Faults: 12
+*/
