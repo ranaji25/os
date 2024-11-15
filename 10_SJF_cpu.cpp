@@ -1,211 +1,179 @@
+#include <stdio.h>
 #include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
 using namespace std;
 
-// Struct to represent a process
-struct Process {
-    int id;
-    int arrival_time;
-    int burst_time;
-    int priority;
-};
+struct node {
+    int fin_time, proc_num, burst_time, arrival_time, wait_time, ta_time;
+} o[50];
 
-// Comparison function for the priority queue (Preemptive)
-struct ComparePriority {
-    bool operator()(const Process& a, const Process& b) {
-        return a.priority > b.priority;
-    }
-};
-
-// Function for Preemptive Priority Scheduling
-void preemptivePriorityScheduling(vector<Process>& processes, int n) {
-    // Manually sort processes based on arrival time (earlier arrival first)
-    sort(processes.begin(), processes.end(), [](Process& a, Process& b) {
-        return a.arrival_time < b.arrival_time;
-    });
-
-    int currentTime = 0;
-    priority_queue<Process, vector<Process>, ComparePriority> readyQueue;
-    vector<int> waitingTime(n, 0);
-    vector<int> turnaroundTime(n, 0);
-    vector<int> finishTime(n, 0);
-    vector<int> remainingBurstTime(n); // To track remaining burst time of processes
-    vector<bool> isInQueue(n, false); // To track if a process is already in the queue
-    int completed = 0;
-
-    // Initialize remaining burst time with the initial burst times
-    for (int i = 0; i < n; i++) {
-        remainingBurstTime[i] = processes[i].burst_time;
-    }
-
-    while (completed < n) {
-        // Add processes that have arrived and are not in the queue
-        for (int i = 0; i < n; i++) {
-            if (processes[i].arrival_time <= currentTime && remainingBurstTime[i] > 0 && !isInQueue[i]) {
-                readyQueue.push(processes[i]);
-                isInQueue[i] = true; // Mark the process as added to the queue
+void bubblesort(struct node t[], int nu) {
+    struct node swap;
+    int i, j;
+    for (i = 0; i < nu - 1; i++) {
+        for (j = 0; j < nu - 1; j++) {
+            if (t[j].burst_time > t[j + 1].burst_time) {
+                swap = t[j];
+                t[j] = t[j + 1];
+                t[j + 1] = swap;
             }
         }
-
-        // Process the one with the highest priority (preemptive)
-        if (!readyQueue.empty()) {
-            Process current = readyQueue.top();
-            readyQueue.pop();
-
-            int processId = current.id - 1;
-
-            // Execute the process for one unit of time
-            remainingBurstTime[processId]--;
-            currentTime++;
-
-            // If the process is completed
-            if (remainingBurstTime[processId] == 0) {
-                finishTime[processId] = currentTime;
-                waitingTime[processId] = finishTime[processId] - processes[processId].arrival_time - processes[processId].burst_time;
-                turnaroundTime[processId] = finishTime[processId] - processes[processId].arrival_time;
-                completed++;
-            } else {
-                // Push the process back to the queue with reduced burst time
-                readyQueue.push(current);
-            }
-        } else {
-            currentTime++; // If no process is ready, just increment time
-        }
-    }
-
-    // Display results
-    cout << "Process ID\tArrival Time\tBurst Time\tPriority\tWaiting Time\tTurnaround Time\tFinish Time\n";
-    for (int i = 0; i < n; i++) {
-        cout << processes[i].id << "\t\t" << processes[i].arrival_time << "\t\t" << processes[i].burst_time << "\t\t" 
-             << processes[i].priority << "\t\t" << waitingTime[i] << "\t\t" << turnaroundTime[i] << "\t\t" << finishTime[i] << endl;
     }
 }
 
-
-// Function for Non-Preemptive Priority Scheduling
-void nonPreemptivePriorityScheduling(vector<Process>& processes, int n) {
-    // Manually sort processes based on priority (higher priority first)
-    sort(processes.begin(), processes.end(), [](Process& a, Process& b) {
-        return a.priority > b.priority;
-    });
-
-    vector<int> waitingTime(n, 0);
-    vector<int> turnaroundTime(n, 0);
-    vector<int> finishTime(n, 0);
-    finishTime[0] = processes[0].burst_time;
-    turnaroundTime[0] = processes[0].burst_time - processes[0].arrival_time;
-    waitingTime[0] = turnaroundTime[0] - processes[0].burst_time;
-
-    for (int i = 1; i < n; i++) {
-        finishTime[i] = finishTime[i - 1] + processes[i].burst_time;
-        turnaroundTime[i] = finishTime[i] - processes[i].arrival_time;
-        waitingTime[i] = turnaroundTime[i] - processes[i].burst_time;
-    }
-
-    // Display results
-    cout << "Gantt Chart:\n";
-    int totalTime = 0;
-    for (const Process& process : processes) {
-        cout << "| P" << process.id << " ";
-        for (int i = 0; i < process.burst_time; i++) {
-            cout << " ";
+void bubblesort2(struct node t[], int nu) {
+    struct node swap;
+    int i, j;
+    for (i = 0; i < nu - 1; i++) {
+        for (j = 0; j < nu - 1; j++) {
+            if (t[j].fin_time > t[j + 1].fin_time) {
+                swap = t[j];
+                t[j] = t[j + 1];
+                t[j + 1] = swap;
+            }
         }
-        totalTime += process.burst_time;
     }
-    cout << "|\n";
-    cout << "0 ";
-    for (int time : finishTime) {
-        cout << " " << time << " ";
+}
+
+int get_smallest(int a[], int n, int bt[]) {
+    int smallest = 9999, index;
+    for (int i = 0; i < n; i++) {
+        if (bt[a[i]] <= smallest) {
+            index = a[i];
+            smallest = bt[a[i]];
+        }
+    }
+    return index;
+}
+
+void sjf_non_preemptive(int n) {
+    int i, j, flag[10] = {0}, count = 0;
+    int fin_tim = 0;
+    cout << "\nSJF Non Preemptive:" << endl;
+    cout << "\nYou have entered the following details:" << endl;
+    cout << "\nP_ID\tAT\tBT" << endl;
+    for (i = 0; i < n; i++) {
+        cout << o[i].proc_num << "\t" << o[i].arrival_time << "\t" << o[i].burst_time << endl;
+    }
+
+    bubblesort(o, n); // Sorting by burst time
+
+    while (count != n) {
+        bool progress = false;
+        for (i = 0; i < n; i++) {
+            // Find the process that has arrived and not yet completed
+            if (o[i].arrival_time <= fin_tim && flag[i] != 1) {
+                flag[i] = 1;  // Mark process as completed
+                fin_tim += o[i].burst_time; // Update the finish time
+                o[i].fin_time = fin_tim;
+                o[i].ta_time = o[i].fin_time - o[i].arrival_time;  // Turnaround time
+                o[i].wait_time = o[i].ta_time - o[i].burst_time;  // Waiting time
+                count++; // Increment completed processes
+                progress = true;
+                break;
+            }
+        }
+
+        // If no progress was made in the loop, break to avoid infinite loop
+        if (!progress) {
+            break;
+        }
+    }
+
+    // Sort by finish time for displaying the results
+    bubblesort2(o, n);
+
+    cout << "\nThe resultant process scheduling is as follows:\nP_ID\tAT\tBT\tFT\tTT\tWT\n";
+    for (i = 0; i < n; i++) {
+        cout << o[i].proc_num << "\t" << o[i].arrival_time << "\t" << o[i].burst_time << "\t"
+             << o[i].fin_time << "\t" << o[i].ta_time << "\t" << o[i].wait_time << endl;
+    }
+}
+
+void sjf_preemptive(int n) {
+    int i, j, indexes[45], k = 0, flag[10] = {0}, count = 0, bt[50], gchart[200];
+    cout << "\nSJF Preemptive:" << endl;
+    cout << "\nYou have entered the following details:" << endl;
+    cout << "\nP_ID\tAT\tBT" << endl;
+    for (i = 0; i < n; i++) {
+        cout << o[i].proc_num << "\t" << o[i].arrival_time << "\t" << o[i].burst_time << endl;
+        bt[i] = o[i].burst_time;
+    }
+
+    bubblesort(o, n); // Sorting by burst time
+    int fin_tim = 0;
+
+    for (i = 0; i < n; i++) {
+        if (o[i].arrival_time == 0) {
+            gchart[k] = o[i].proc_num;
+            k++;
+            flag[i] = 1;
+            fin_tim += 1;
+            bt[i] = bt[i] - 1;
+            if (bt[i] == 0) {
+                count += 1;
+                o[i].fin_time = fin_tim;
+                o[i].ta_time = o[i].fin_time - o[i].arrival_time;
+                o[i].wait_time = o[i].ta_time - o[i].burst_time;
+            }
+            break;
+        }
+    }
+
+    int g, ind;
+    while (count != n) {
+        g = 0;
+        for (i = 0; i < n; i++) {
+            if ((o[i].arrival_time <= fin_tim) && (bt[i] != 0)) {
+                indexes[g] = i;
+                g++;
+            }
+        }
+
+        ind = get_smallest(indexes, g, bt);
+        gchart[k] = o[ind].proc_num;
+        k++;
+        flag[ind] = 1;
+        fin_tim += 1;
+        bt[ind] = bt[ind] - 1;
+        if (bt[ind] == 0) {
+            count += 1;
+            o[ind].fin_time = fin_tim;
+            o[ind].ta_time = o[ind].fin_time - o[ind].arrival_time;
+            o[ind].wait_time = o[ind].ta_time - o[ind].burst_time;
+        }
+    }
+
+    cout << "\nGantt Chart:\n ";
+    for (i = 0; i < k; i++) {
+        cout << gchart[i] << " ";
     }
     cout << endl;
 
-    cout << "Process ID\tArrival Time\tBurst Time\tPriority\tTurnaround Time\tFinish Time\tWaiting Time\n";
-    for (int i = 0; i < n; i++) {
-        cout << processes[i].id << "\t\t" << processes[i].arrival_time << "\t\t" << processes[i].burst_time << "\t\t" 
-             << processes[i].priority << "\t\t" << turnaroundTime[i] << "\t\t" << finishTime[i] << "\t\t" << waitingTime[i] << endl;
+    cout << "\nThe resultant process scheduling is as follows:\nP_ID\tAT\tBT\tFT\tTT\tWT\n";
+    for (i = 0; i < n; i++) {
+        cout << o[i].proc_num << "\t" << o[i].arrival_time << "\t" << o[i].burst_time << "\t"
+             << o[i].fin_time << "\t" << o[i].ta_time << "\t" << o[i].wait_time << endl;
     }
 }
 
 int main() {
-    int n;
-    cout << "Enter the number of processes: ";
+    int n, choice;
+    cout << "Enter number of processes:\t";
     cin >> n;
-
-    vector<Process> processes(n);
-
-    // Input process information
+    cout << "Enter the burst time and arrival time of respective processes:\n";
     for (int i = 0; i < n; i++) {
-        processes[i].id = i + 1;
-        cout << "Enter arrival time for process " << i + 1 << ": ";
-        cin >> processes[i].arrival_time;
-        cout << "Enter burst time for process " << i + 1 << ": ";
-        cin >> processes[i].burst_time;
-        cout << "Enter priority for process " << i + 1 << ": ";
-        cin >> processes[i].priority;
+        o[i].proc_num = i;
+        cout << "Enter arrival time for process " << i << " :\t";
+        cin >> o[i].arrival_time;
+        cout << "Enter burst time for process " << i << " :\t";
+        cin >> o[i].burst_time;
     }
 
+    // Non-Preemptive SJF
+    sjf_non_preemptive(n);
 
- 
-
-
-        cout << "\nPreemptive Priority Scheduling\n";
-        preemptivePriorityScheduling(processes, n);
-   
-        cout << "\nNon-Preemptive Priority Scheduling\n";
-        nonPreemptivePriorityScheduling(processes, n);
-  
-        
-  
+    // Uncomment the following line if you want to run preemptive SJF as well
+    sjf_preemptive(n);
 
     return 0;
 }
-
-/*
-Enter the number of processes: 7
-Enter arrival time for process 1: 0
-Enter burst time for process 1: 3
-Enter priority for process 1: 2
-Enter arrival time for process 2: 2
-Enter burst time for process 2: 5
-Enter priority for process 2: 6
-Enter arrival time for process 3: 1
-Enter burst time for process 3: 4
-Enter priority for process 3: 3
-Enter arrival time for process 4: 4
-Enter burst time for process 4: 2
-Enter priority for process 4: 5
-Enter arrival time for process 5: 6
-Enter burst time for process 5: 9
-Enter priority for process 5: 7
-Enter arrival time for process 6: 5
-Enter burst time for process 6: 4
-Enter priority for process 6: 4
-Enter arrival time for process 7: 7
-Enter burst time for process 7: 10
-Enter priority for process 7: 10
-
-Preemptive Priority Scheduling
-Process ID      Arrival Time    Burst Time      Priority        Waiting Time    Turnaround Time Finish Time
-1               0               3               2               0               3               3
-3               1               4               3               18              22              23
-2               2               5               6               1               6               8
-4               4               2               5               13              15              19
-6               5               4               4               18              22              27
-5               6               9               7               2               11              17
-7               7               10              10              20              30              37
-
-Non-Preemptive Priority Scheduling
-Gantt Chart:
-| P7           | P5          | P2      | P4   | P6     | P3     | P1    |
-0  10  19  24  26  30  34  37
-Process ID      Arrival Time    Burst Time      Priority        Turnaround Time Finish Time     Waiting Time
-7               7               10              10              3               10              -7
-5               6               9               7               13              19              4
-2               2               5               6               22              24              17
-4               4               2               5               22              26              20
-6               5               4               4               25              30              21
-3               1               4               3               33              34              29
-1               0               3               2               37              37              34
-*/
