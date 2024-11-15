@@ -96,3 +96,36 @@ int main()
         }
     }
 }
+/*
+Enter the no of the process: 3
+
+Enter the no of resources: 3
+
+Total Amount of the Resource R  1: 10
+
+Total Amount of the Resource R  2: 5
+
+Total Amount of the Resource R  3: 7
+
+Enter the request matrix:1
+0
+2
+3
+2
+2
+2
+1
+3
+
+Enter the allocation matrix:2
+1
+3
+2
+1
+1
+3
+2
+2
+Resc 0 :: 3Resc 1 :: 1Resc 2 :: 1
+ Deadlock detected
+*/
