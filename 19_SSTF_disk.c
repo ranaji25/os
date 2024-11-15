@@ -54,3 +54,24 @@ int main() {
     sstf(requestQueue, n, head);
     return 0;
 }
+/*
+Enter the number of requests: 9
+Enter the request queue:
+55 58 39 18 90 160 150 38 184
+Enter the initial head position: 100
+SSTF Disk Scheduling Algorithm
++------------------------+------------------+------------------+
+| Request                | Head Movement     | Cumulative Seek  |
++------------------------+------------------+------------------+
+| 100                    -> 90     | 10               | 10               |
+| 90                     -> 58     | 32               | 42               |
+| 58                     -> 55     | 3                | 45               |
+| 55                     -> 39     | 16               | 61               |
+| 39                     -> 38     | 1                | 62               |
+| 38                     -> 18     | 20               | 82               |
+| 18                     -> 150    | 132              | 214              |
+| 150                    -> 160    | 10               | 224              |
+| 160                    -> 184    | 24               | 248              |
++------------------------+------------------+------------------+
+Total Seek Time (SSTF): 248
+ */
