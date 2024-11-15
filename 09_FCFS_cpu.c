@@ -95,3 +95,25 @@ int main()
     Fcfs();
     return 0;
 }
+
+
+/*
+Enter the number of processes: 5
+Enter arrival time for process 1: 0
+Enter burst time for process 1: 6
+Enter arrival time for process 2: 2
+Enter burst time for process 2: 2
+Enter arrival time for process 3: 3
+Enter burst time for process 3: 1
+Enter arrival time for process 4: 4
+Enter burst time for process 4: 9
+Enter arrival time for process 5: 5
+Enter burst time for process 5: 8
+
+Pid|Arrival| Burst |Complete | Turn|Waiting
+1       0       6       6       6       0
+2       2       2       8       6       4
+3       3       1       9       6       5
+4       4       9       18      14      5
+5       5       8       26      21      13
+*/
